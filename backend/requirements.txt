@@ -1,0 +1,7 @@
+# backend API
+fastapi
+uvicorn
+pydantic
+
+# backend NLP
+spacy
