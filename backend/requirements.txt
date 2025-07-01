@@ -1,7 +1,14 @@
-# backend API
-fastapi
-uvicorn
-pydantic
+# Backend API
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
 
-# backend NLP
-spacy
+# Backend NLP
+spacy>=3.7.0
+transformers>=4.35.0
+torch>=2.1.0
+langdetect>=1.0.9
+
+# Utilities
+python-multipart  # Per form data
+python-dotenv     # Per environment variables
