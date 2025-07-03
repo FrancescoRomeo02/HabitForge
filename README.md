@@ -1,4 +1,115 @@
-# HabitForge 🔥
+# 🔥 HabitForge
+
+Un'app per il tracking delle abitudini con analisi automatica del linguaggio naturale.
+
+## 🚀 Quick Start
+
+```bash
+# Avvia l'intera applicazione (database + backend + pgAdmin)
+docker-compose up --build
+
+# Accedi all'API documentation
+http://localhost:8000/docs
+
+# Accedi al database via pgAdmin (interfaccia web)
+http://localhost:5050
+
+# Testa l'endpoint
+curl -X POST "http://localhost:8000/habits/analyze" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "Voglio correre 5km tutti i giorni"}'
+```
+
+## 📊 Database Access
+
+Il progetto include **pgAdmin** per gestire visivamente il database PostgreSQL:
+
+- **URL**: http://localhost:5050
+- **Login**: admin@habitforge.com
+- **Password**: admin123
+
+### Connessione al database in pgAdmin:
+1. Vai su http://localhost:5050
+2. Effettua il login con le credenziali sopra
+3. Clicca su "Add New Server"
+4. **Name**: HabitForge DB
+5. **Host**: db
+6. **Port**: 5432
+7. **Database**: habitforge_db
+8. **Username**: postgres
+9. **Password**: postgres
+
+## 🏗️ Architettura
+
+```
+├── backend/
+│   ├── app/
+│   │   ├── api/          # FastAPI endpoints
+│   │   │   ├── models/   # Pydantic data models
+│   │   │   └── server.py # Main FastAPI application
+│   │   ├── db/           # Database access layer
+│   │   └── NLM/          # Natural Language Processing
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── .env             # Configurazione database e pgAdmin
+│   └── tests/           # Test suite
+├── docker-compose.yml   # Orchestrazione completa (db + backend + pgAdmin)
+└── README.md
+```
+
+## 🎯 Funzionalità
+
+- **NLP Analysis**: Estrazione automatica di azione, quantità e frequenza da testo naturale
+- **Database**: PostgreSQL con schema completo per abitudini e utenti
+- **API**: FastAPI con documentazione automatica
+- **Admin Interface**: pgAdmin per gestione database
+- **Docker**: Setup completo con un solo comando
+
+## 🧪 Esempio di Utilizzo
+
+```json
+POST /habits/analyze
+{
+  "text": "Bere 2 litri di acqua al giorno",
+  "user_id": "user123"
+}
+
+Response:
+{
+  "status": "success",
+  "analysis": {
+    "action": "bere",
+    "quantity": "2 litri",
+    "frequency_count": 7,
+    "frequency_period": 7,
+    "language": "it"
+  }
+}
+```
+
+## 🛠️ Sviluppo
+
+```bash
+# Solo backend per sviluppo
+cd backend
+pip install -r requirements.txt
+uvicorn app.api.server:app --reload
+
+# Solo database + pgAdmin
+docker-compose up db pgadmin
+
+# Ricostruisci solo il backend
+docker-compose up --build backend
+```
+
+## 📊 Database Schema
+
+Il database include:
+- **users**: Gestione utenti
+- **habits**: Abitudini con analisi NLP
+- **habit_entries**: Tracking giornaliero
+- **social_groups**: Gruppi sociali
+- **group_members**: Membri dei gruppi 🔥
 
 ### A smart, social habit tracker that leverages friendly competition to turn your goals into achievements.
 

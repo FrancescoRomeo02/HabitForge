@@ -8,8 +8,10 @@ import os
 # Aggiungi il path per importare il modulo NLM
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'NLM'))
 
+extract_habits_ml = None
+
 try:
-    from habit_nalyze import extract_habits_ml
+    from NLM.habit_nalyze import extract_habits_ml
     NLP_AVAILABLE = True
     print("✅ NLP module loaded successfully")
 except ImportError as e:
@@ -43,7 +45,7 @@ async def analyze_habit_text(request: HabitInput):
     print(f"--> Text received from client: '{request.text}'")
     
     try:
-        if NLP_AVAILABLE:
+        if NLP_AVAILABLE and extract_habits_ml:
             # Usa il modulo NLP per analizzare il testo
             analysis = extract_habits_ml(request.text)
             

@@ -48,6 +48,53 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+
+# Database Files - NON COMMITTARE MAI!
+**/db/db/
+*.db
+*.sqlite3
+postgres_data/
+pgadmin_data/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker volumes
+docker-volumes/
+
+# Logs
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Node.js (per future frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
 .pytest_cache/
 cover/
 

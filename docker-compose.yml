@@ -1,14 +1,58 @@
-version: '3.13'
- 
 services:
-  server:
+  # Database PostgreSQL
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    container_name: habitforge_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=habitforge_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/app/db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: habitforge_backend
     volumes:
       - ./backend/:/backend/
-    command: uvicorn app.api.server:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    command: sh -c "while ! nc -z db 5432; do echo 'Waiting for database...'; sleep 1; done && uvicorn app.api.server:app --reload --workers 1 --host 0.0.0.0 --port 8000"
     env_file:
       - ./backend/.env
     ports:
-      - 8000:8000
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/habitforge_db
+
+  # Database Administration Interface
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: habitforge_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@habitforge.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  pgadmin_data:

@@ -1,7 +1,8 @@
 import spacy
 from langdetect import detect
 import re
-from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers.pipelines import pipeline
 from typing import Dict, List
 
 # Carica i modelli una volta sola
@@ -21,7 +22,6 @@ try:
     tokenizer_en = AutoTokenizer.from_pretrained("dbmdz/bert-large-cased-finetuned-conll03-english")
     model_en = AutoModelForTokenClassification.from_pretrained("dbmdz/bert-large-cased-finetuned-conll03-english")
     ner_pipeline_en = pipeline("ner", model=model_en, tokenizer=tokenizer_en, aggregation_strategy="simple")
-
     # Per italiano - modello BERT fine-tuned
     tokenizer_it = AutoTokenizer.from_pretrained("Davlan/bert-base-multilingual-cased-ner-hrl")
     model_it = AutoModelForTokenClassification.from_pretrained("Davlan/bert-base-multilingual-cased-ner-hrl")
@@ -32,16 +32,6 @@ except Exception as e:
     print(f"⚠️ Errore nel caricamento dei modelli transformer: {e}")
     ner_pipeline_en = None
     ner_pipeline_it = None
-
-texts = [
-    "I plan to meditate every morning for 10 minutes.",
-    "I wish to learn a new language this year.",
-    "Bere 5 litri di acqua al giorno",
-    "Andare in palestra 5 volte alla settimana",
-    "Studiare inglese 2 ore al giorno",
-    "Leggere 10 pagine di un libro ogni sera",
-    "Voglio correre 3 km ogni mattina",
-]
 
 def detect_language(text: str) -> spacy.language.Language:
     try:
