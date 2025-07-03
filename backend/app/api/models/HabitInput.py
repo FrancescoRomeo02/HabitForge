@@ -42,3 +42,23 @@ class HabitAnalysisResponse(BaseModel):
                 }
             }
         }
+
+class HabitDatabaseModel(BaseModel):
+    """
+    Model for the habit database.
+    """
+    user_id: int
+    name: str
+    description: str
+    frequency: str
+
+    class Config:
+        orm_mode = True
+        json_schema_extra = {
+            "example": {
+                "user_id": "123",
+                "name": "Correre",
+                "description": "correre 5km ogni giorno",
+                "frequency": "daily"
+            }
+        }

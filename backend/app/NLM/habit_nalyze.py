@@ -4,6 +4,7 @@ import re
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 from transformers.pipelines import pipeline
 from typing import Dict, List
+from api.models.HabitInput import HabitDatabaseModel
 
 # Carica i modelli una volta sola
 try:
@@ -247,3 +248,12 @@ def extract_habits_ml(text: str) -> dict:
         "entities_detected": entities,
         "ml_confidence": (action_info["score"] + frequency_info["confidence"]) / 2
     }
+
+def create_habit_object(analysis: dict) -> HabitDatabaseModel:
+    """Crea un oggetto abitudine da salvare nel database"""
+    return HabitDatabaseModel(
+        user_id="User123",  # Placeholder, should be replaced with actual user ID
+        name=analysis.get("action", "Unknown"),
+        description=analysis.get("text", ""),
+        frequency=analysis.get("frequency_text", "Unknown")
+    )

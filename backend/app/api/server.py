@@ -1,7 +1,9 @@
 # server.py
 
+from random import randint
 from fastapi import FastAPI, HTTPException
-from .models.HabitInput import HabitInput, HabitAnalysisResponse
+from .models.HabitInput import HabitInput, HabitAnalysisResponse,
+from app.db.database import HabitRepository
 import sys
 import os
 
@@ -9,11 +11,11 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'NLM'))
 
 extract_habits_ml = None
+create_habit_object = None
 
 try:
-    from NLM.habit_nalyze import extract_habits_ml
+    from NLM.habit_nalyze import extract_habits_ml, create_habit_object
     NLP_AVAILABLE = True
-    print("✅ NLP module loaded successfully")
 except ImportError as e:
     print(f"⚠️ NLP module not available: {e}")
     NLP_AVAILABLE = False
@@ -45,33 +47,40 @@ async def analyze_habit_text(request: HabitInput):
     print(f"--> Text received from client: '{request.text}'")
     
     try:
-        if NLP_AVAILABLE and extract_habits_ml:
+        if NLP_AVAILABLE and extract_habits_ml and create_habit_object:
             # Usa il modulo NLP per analizzare il testo
             analysis = extract_habits_ml(request.text)
-            
+            habitObj = create_habit_object(analysis)
+
+
+            # Save to database
+            habit_repo = HabitRepository()
+            habit_id = habit_repo.create_habit(
+                name=habitObj.name,
+                description=habitObj.description,
+                frequency=habitObj.frequency,
+                user_id=habitObj.user_id
+            )
+            print(f"✅ Habit saved to database with ID: {habit_id}")   
+
             return HabitAnalysisResponse(
                 status="success",
-                message="Habit analyzed successfully using ML",
+                message="Habit analyzed successfully",
                 original_text=request.text,
-                analysis={
-                    "action": analysis.get("action"),
-                    "quantity": analysis.get("quantities", [{}])[0] if analysis.get("quantities") else None,
-                    "target": analysis.get("target"),
-                    "frequency_count": analysis.get("frequency_count"),
-                    "frequency_period": analysis.get("frequency_period"),
-                    "frequency_text": analysis.get("frequency_text"),
-                    "language": analysis.get("language"),
-                    "confidence": analysis.get("ml_confidence", 0.0)
-                }
+                analysis=analysis
             )
         else:
-            # Fallback: analisi semplice senza ML
+            print("⚠️ NLP module not available, returning default response")
             return HabitAnalysisResponse(
-                status="success",
-                message="Text received (NLP not available)",
+                status="error",
+                message="NLP module not available",
                 original_text=request.text,
                 analysis=None
             )
+        
+
+        
+
             
     except Exception as e:
         print(f"❌ Error analyzing habit: {e}")
